@@ -10,4 +10,5 @@ Update salary for an employee
 curl -v -X PUT  -H "Content-type:application/json" -H "Authorization:FD aw4567123edkk99" -d '{"salary":370000, "fullName":"Icker Casillas", "address":"Liber u94"}' http://localhost:15155/EmployeesPage/admin/data/employees/updateEmployee
 ------------------------------------------------------
 Employee Handler
-
+Login to system using employee's credentials
+curl -v -X POST -H "Content-type:application/json" -H "Authorization:FD aw4567123edkk99" -d '{"userName":"raul7G", "password":"Labs1234"}' http://localhost:15155/EmployeesPage/employee/data/login

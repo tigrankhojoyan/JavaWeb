@@ -8,6 +8,7 @@ package admin.rest;
 import db.functions.DBFunctions;
 import employee.rest.Employee;
 import java.util.List;
+import java.util.UUID;
 import org.codehaus.jackson.map.util.JSONPObject;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+
 
 /**
  *
@@ -43,9 +45,11 @@ public class AdminEventsHandler {
     public ResponseEntity<Employee> addEmployeeData(@RequestBody Employee receivedData,
             @RequestHeader HttpHeaders header) {
         if (header.containsKey("Authorization") && header.get("Authorization").get(0).equals("FD aw4567123edkk99")) {
+            String swid = "{" + UUID.randomUUID().toString() + "}";
             dbActions.addEmployee(receivedData.getFullName(), receivedData.getAddress(),
                     receivedData.getSalary(), receivedData.getUserName(), 
-                    receivedData.getPassword(), receivedData.getEmployeeData());
+                    receivedData.getPassword(), receivedData.getEmployeeData(), swid);
+            receivedData.setSwid(swid);
             return new ResponseEntity<Employee>(receivedData, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

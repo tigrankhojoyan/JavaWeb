@@ -21,19 +21,20 @@ public class Employee {
     private String password;
     private String userName;
     private String swid;
+    private String accessToken;
     private IndividualData employeeData;
     
 
     public Employee(int salary, String fullName,
             String address, String userName, 
-            String password, IndividualData employeeData) {
+            String password, IndividualData employeeData, String swid) {
         this.salary = salary;
         this.fullName = fullName;
         this.address = address;
         this.employeeData = employeeData;
         this.password = password;
         this.userName = userName;
-        this.swid = "{" + UUID.randomUUID().toString() + "}";
+        this.swid = swid; 
     }
     
     public Employee(int salary, String fullName,
@@ -116,8 +117,15 @@ public class Employee {
     public void setSwid(String swid) {
         this.swid = swid;
     }
-    
 
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+    
     @Override
     public String toString() {
         IndividualData employeeData = getEmployeeData();
@@ -128,7 +136,8 @@ public class Employee {
                 + getSalary() + ",\"id\":"
                 + getId() + ", \"employeeData\":"
                 + employeeData.toString() + ", \"swid\": \"" 
-                + getSwid() + "\"}";
+                + getSwid() + "\", \"accessToken\":\"" + 
+                getAccessToken() + "\"}";
         return employeeString;
     }
 

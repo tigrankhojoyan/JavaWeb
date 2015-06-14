@@ -65,7 +65,7 @@ public class DBFunctions {
     /* Method to add an employee record in the database */
     public Integer addEmployee(String fullName, String address,
             int salary, String userName, String password, 
-            IndividualData individualData) {
+            IndividualData individualData, String swid) {
         Session session = factory.openSession();
         Transaction tx = null;
         Integer employeeID = null;
@@ -73,7 +73,7 @@ public class DBFunctions {
             tx = session.beginTransaction();
             IndividualData employeeData = individualData;
             Employee employee = new Employee(salary, fullName, address,
-                    userName, password, individualData);
+                    userName, password, individualData, swid);
             session.save(employeeData);
             employeeID = (Integer) session.save(employee);
             tx.commit();
@@ -208,6 +208,40 @@ public class DBFunctions {
         } finally {
             session.close();
         }
+    }
+    
+    public boolean updateEmployeePassword(String userName, String oldPassword, 
+            String newPassword) {
+        Session session = factory.openSession();
+        Criteria cr = session.createCriteria(Employee.class);
+        cr.add(Restrictions.eq("userName", userName));
+        cr.add(Restrictions.eq("password", oldPassword));
+        try {
+            List employees = cr.list();
+            System.out.println("=================iiiiiiiiiiii == "
+                    + employees.size());
+            if (0 == employees.size()) {
+                return false;
+            }
+            session.getTransaction().begin();
+            for (Iterator iterator1
+                    = employees.iterator(); iterator1.hasNext();) {
+                Employee employee = (Employee) iterator1.next();
+                employee.setPassword(newPassword);
+                session.update(employee);
+            }
+            session.getTransaction().commit();
+            System.out.println("The password has been changed successfully");
+            return true;
+        } catch (HibernateException e) {
+            if (session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return false;
     }
 
 }
