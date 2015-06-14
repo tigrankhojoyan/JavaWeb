@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+  "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+  "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="employee.rest.IndividualData" table="INDIVIDUALDATA">
+        <meta attribute="class-description">
+            This class contains the employee's individual data. 
+        </meta>
+        <id column="id" name="id" type="int">
+            <generator class="native"/>
+        </id>
+        <property column="country" name="country" type="string"/>
+        <property column="city" name="city" type="string"/>
+        <property column="gender" name="gender" type="string"/>
+        <property column="email" name="email" type="string"/>
+        <property column="age" name="age" type="int"/>
+    </class>
+</hibernate-mapping>
