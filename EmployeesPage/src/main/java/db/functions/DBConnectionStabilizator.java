@@ -15,7 +15,8 @@ import java.sql.Statement;
  * @author tigran
  */
 public class DBConnectionStabilizator {
-     private final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
+
+    private final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
     private final String DB_URL = "jdbc:mysql://localhost/EmployeesProject";
 
     //  Database credentials
@@ -66,10 +67,35 @@ public class DBConnectionStabilizator {
             System.err.println("Failed to create db." + e.getMessage());
         }
     }
-    
+
+    /**
+     * Creates EmployeesProject database if it does not exist.
+     * 
+     * @throws SQLException 
+     */
     public void establishConnection() throws SQLException {
-        if(!connectToDB("jdbc:mysql://localhost/EmployeesProject")) {
+        if (!connectToDB("jdbc:mysql://localhost/EmployeesProject")) {
             createDBAndTable();
+        }
+    }
+
+    /**
+     * Deletes the specified table from EmployeesProject DB
+     * @param tableName 
+     */
+    public void deleteTable(String tableName) {
+        try {
+            connectToDB("jdbc:mysql://localhost/EmployeesProject");
+        } catch (Exception e) {
+            System.out.println("The EmployeesProject db does not exist!\n"
+                    + e.getMessage());
+        }
+        String sqlQuery = "drop table " + tableName;
+        try {
+            stmt.executeUpdate(sqlQuery);
+        } catch (SQLException ex) {
+            System.err.println("Failed to delete '" + tableName + 
+                    "' table.\n" + ex.getMessage());
         }
     }
 }

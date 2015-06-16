@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.apache.commons.lang.RandomStringUtils;
 import java.security.SecureRandom;
+import my.email.Sent;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -91,7 +92,36 @@ public class EmployeeEventsHandler {
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
          //System.out.println("newPass========" + newPassword);
-
     }
+    
+    @RequestMapping(value = "/sendMessage", method = RequestMethod.POST,
+            headers = {"Content-type=application/json"})
+    public ResponseEntity<String> sendMessage(@RequestHeader HttpHeaders headers,
+            @RequestBody Sent messageData) {
+        if(dbActions.sendMessage("fenomen", messageData)) {
+            System.out.println("ok----------------");
+        }else {
+             System.out.println("chhhhhhhhok----------------");
+        }
+        
+        return new ResponseEntity(messageData.toString(), HttpStatus.OK);
+        /*if (!headers.containsKey("Authorization")
+                || !headers.get("Authorization").get(0).equals("FD aw4567123edkk99")
+                || !headers.containsKey("access-token")
+                || null == accessTokens.getEmployeeUsernameByAccessToken(headers.get("access-token").get(0))) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        String accessToken = headers.get("access-token").get(0);
+        String userName = accessTokens.getEmployeeUsernameByAccessToken(accessToken);
+        System.out.println("AccessToken =======" + accessToken);
+        System.out.println("userName =============" + userName);
+        if (dbActions.updateEmployeePassword(userName, passData.getOldPassword(),
+                passData.getNewPassword())) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+         //System.out.println("newPass========" + newPassword);*/
+    }
+    
 
 }

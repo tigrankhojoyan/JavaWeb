@@ -5,7 +5,7 @@
   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="employee.rest.Employee" table="EMPLOYEE">
+    <class name="employee.rest.Employee"  table="EMPLOYEE">
         <meta attribute="class-description">
             This class contains the employee detail. 
         </meta>

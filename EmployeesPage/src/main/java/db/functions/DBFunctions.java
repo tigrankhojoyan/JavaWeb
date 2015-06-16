@@ -19,6 +19,11 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import employee.rest.IndividualData;
+import my.email.Inbox;
+import my.email.MyNamingStrategy;
+import my.email.Sent;
+import org.hibernate.cfg.AnnotationConfiguration;
+
 /**
  *
  * @author tigran
@@ -26,10 +31,14 @@ import employee.rest.IndividualData;
 public class DBFunctions {
 
     private static SessionFactory factory;
+    private static SessionFactory inboxFactory;
+    private static SessionFactory sendBoxFactory;
+    private static SessionFactory mailFactory;
+    private DBConnectionStabilizator dbConnection = new DBConnectionStabilizator();
+    Configuration config;
 
     public DBFunctions() {
         try {
-            DBConnectionStabilizator dbConnection = new DBConnectionStabilizator();
             dbConnection.establishConnection();
             factory = new Configuration().configure().buildSessionFactory();
         } catch (Throwable ex) {
@@ -64,7 +73,7 @@ public class DBFunctions {
 
     /* Method to add an employee record in the database */
     public Integer addEmployee(String fullName, String address,
-            int salary, String userName, String password, 
+            int salary, String userName, String password,
             IndividualData individualData, String swid) {
         Session session = factory.openSession();
         Transaction tx = null;
@@ -85,6 +94,8 @@ public class DBFunctions {
         } finally {
             session.close();
         }
+        createInboxTableForSpecifiedUser(userName);
+        createSentTableForSpecifiedUser(userName);
         return employeeID;
     }
 
@@ -142,6 +153,8 @@ public class DBFunctions {
                 session.delete(employeeData);
             }
             session.getTransaction().commit();
+            dbConnection.deleteTable("INBOX" + userName);
+            dbConnection.deleteTable("SENT" + userName);
             return true;
         } catch (HibernateException e) {
             if (session.getTransaction() != null) {
@@ -186,7 +199,7 @@ public class DBFunctions {
         }
         return false;
     }
-    
+
     public Employee loginToSystem(String userName, String password) {
         Session session = factory.openSession();
         Criteria cr = session.createCriteria(Employee.class);
@@ -198,7 +211,7 @@ public class DBFunctions {
                     + employees.size());
             if (0 == employees.size()) {
                 return null;
-            } 
+            }
             Employee a = (Employee) employees.get(0);
             System.out.println("data=========" + a.toString());
             return a;
@@ -209,8 +222,8 @@ public class DBFunctions {
             session.close();
         }
     }
-    
-    public boolean updateEmployeePassword(String userName, String oldPassword, 
+
+    public boolean updateEmployeePassword(String userName, String oldPassword,
             String newPassword) {
         Session session = factory.openSession();
         Criteria cr = session.createCriteria(Employee.class);
@@ -244,5 +257,67 @@ public class DBFunctions {
         return false;
     }
 
-}
+    public void createInboxTableForSpecifiedUser(String userName) {
+        try {
+            inboxFactory = new AnnotationConfiguration().
+                    configure().
+                    addAnnotatedClass(Inbox.class).setNamingStrategy(new MyNamingStrategy(userName)).
+                    buildSessionFactory();
+            Session session = inboxFactory.openSession();
+            Inbox inbox = new Inbox("test", "test", "Valod");
+            Transaction tx = null;
+            tx = session.beginTransaction();
+            session.save(inbox);
+            tx.commit();
+        } catch (Throwable ex) {
+            System.err.println("Failed to create sessionFactory object." + ex);
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
 
+    public void createSentTableForSpecifiedUser(String userName) {
+        try {
+            sendBoxFactory = new AnnotationConfiguration().
+                    configure().
+                    addAnnotatedClass(Sent.class).setNamingStrategy(new MyNamingStrategy(userName)).
+                    buildSessionFactory();
+            Session session = sendBoxFactory.openSession();
+            Sent sent = new Sent("test", "test", "VZGO");
+            Transaction tx = null;
+            tx = session.beginTransaction();
+            session.save(sent);
+            tx.commit();
+        } catch (Throwable ex) {
+            System.err.println("Failed to create sessionFactory object." + ex);
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+    
+    public boolean sendMessage(String sender, Sent messageData) {
+        try {
+            sendBoxFactory = new AnnotationConfiguration().
+                    configure().
+                    addAnnotatedClass(Sent.class).setNamingStrategy(new MyNamingStrategy(sender)).
+                    buildSessionFactory();
+            inboxFactory = new AnnotationConfiguration().
+                    configure().
+                    addAnnotatedClass(Inbox.class).setNamingStrategy(new MyNamingStrategy(messageData.getRecipients())).
+                    buildSessionFactory();
+            Session sendingSession = sendBoxFactory.openSession();
+            Session inboxSession = inboxFactory.openSession();
+            Transaction tx = sendingSession.beginTransaction();
+            Transaction tx1 = inboxSession.beginTransaction();
+            sendingSession.save(messageData);
+            Inbox inbox = new Inbox(messageData.getMessageText(), messageData.getMessageSubject(), sender);
+            inboxSession.save(inbox);
+            tx.commit();
+            tx1.commit();
+            System.out.println("Sent message");
+            return true;
+        } catch (Exception ex) {
+            System.out.println("Failed to create sessionFactory object." + ex.getMessage());
+            return false;
+        }
+    }
+
+}
