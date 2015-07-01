@@ -5,7 +5,6 @@
  */
 package employee.rest;
 
-import admin.rest.Admin;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
@@ -14,7 +13,7 @@ import org.springframework.validation.Validator;
  *
  * @author tigran
  */
-public class EmployeeLoginValidator{} /*implements Validator{
+public class EmployeeLoginValidator implements Validator{
 
     @Override
     public boolean supports(Class clazz) {
@@ -27,15 +26,15 @@ public class EmployeeLoginValidator{} /*implements Validator{
                 "required.userName", "Field name is required.");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "employeePassword",
                 "required.password", "Field name is required.");
-       //EmployeeLogin employee = (EmployeeLogin) obj;
+       EmployeeLogin employee = (EmployeeLogin) obj;
 
-        /*if (!(employee.getPassword().equals("myPass"))) {
-            errors.rejectValue("password", "notmatch.password");
+        if (!(employee.getEmployeePassword().equals("myPass"))) {
+            errors.rejectValue("employeePassword", "notmatch.password");
         }
 
-        if (!(employee.getUserName().equals("Admin"))) {
-            errors.rejectValue("userName", "notmatch.userName");
+        if (!(employee.getEmployeeUserName().equals("Admin"))) {
+            errors.rejectValue("employeeUserName", "notmatch.userName");
         }
     }
     
-}*/
+}

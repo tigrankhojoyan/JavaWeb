@@ -5,6 +5,7 @@
  */
 package admin.rest;
 
+import db.functions.AccessTokens;
 import db.functions.DBFunctions;
 import employee.rest.Employee;
 import java.util.List;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 /**
  *
  * @author tigran
@@ -37,6 +37,8 @@ public class AdminEventsHandler {
     @RequestMapping(value = "/example", method = RequestMethod.GET)
     public @ResponseBody
     String example() {
+        AccessTokens accessTokens = AccessTokens.getInstance();
+        accessTokens.printAccessTokens();
         return "example";
     }
 
@@ -47,7 +49,7 @@ public class AdminEventsHandler {
         if (header.containsKey("Authorization") && header.get("Authorization").get(0).equals("FD aw4567123edkk99")) {
             String swid = "{" + UUID.randomUUID().toString() + "}";
             dbActions.addEmployee(receivedData.getFullName(), receivedData.getAddress(),
-                    receivedData.getSalary(), receivedData.getUserName(), 
+                    receivedData.getSalary(), receivedData.getUserName(),
                     receivedData.getPassword(), receivedData.getEmployeeData(), swid);
             receivedData.setSwid(swid);
             return new ResponseEntity<Employee>(receivedData, HttpStatus.OK);

@@ -6,7 +6,6 @@
 package db.functions;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 /**
  *
@@ -15,7 +14,7 @@ import java.util.Iterator;
 public class AccessTokens {
 
     private static AccessTokens accessTokens = null;
-    private HashMap<String, String> accessTokensList = new HashMap();
+    private static HashMap<String, String> accessTokensList = new HashMap();
 
     private AccessTokens() {
 
@@ -23,7 +22,7 @@ public class AccessTokens {
 
     public static AccessTokens getInstance() {
         if (accessTokens == null) {
-            return new AccessTokens();
+            accessTokens = new AccessTokens();
         }
         return accessTokens;
     }
@@ -56,6 +55,11 @@ public class AccessTokens {
         }
         System.out.println("000000000in else000000000000000");
         return null;
+    }
+
+    public void printAccessTokens() {
+        System.out.println("accessTokens=========\n"
+                + accessTokensList.toString() + "\n============================");
     }
 
 }

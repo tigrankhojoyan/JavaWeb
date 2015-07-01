@@ -63,4 +63,23 @@ public class Inbox {
         this.sender = sender;
     }
 
+    public int getMessageNum() {
+        return messageNum;
+    }
+
+    public void setMessageNum(int messageNum) {
+        this.messageNum = messageNum;
+    }
+   
+    
+    @Override
+    public String toString() {
+       String inboxData = "{\"messageText\": \""
+                + getMessageText() + "\", \"messageSubject\":\""
+                + getMessageSubject() + "\", \"sender\":\""
+                + getSender() + "\", \"messageNum\":" 
+                + getMessageNum() + "}";
+       return inboxData;
+    }
+
 }

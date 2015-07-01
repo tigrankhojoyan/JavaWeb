@@ -5,23 +5,23 @@
 
     <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping" />
 	
-    <bean class="admin.rest.AdminController">
+     <bean class="admin.rest.AdminController">
         <property name="formView" value="LoginPage" />
         <property name="successView" value="AdminPage" />
-        <!-- Map a validator -->
+        
         <property name="validator">
             <bean class="admin.rest.AdminValidator" />
         </property>
     </bean>
     
-  <!--  <bean class="employee.rest.EmployeeLoginController">
+    <bean class="employee.rest.EmployeeLoginController">
         <property name="formView" value="LoginPage" />
         <property name="successView" value="EmployeePage" />
         
         <property name="validator">
             <bean class="employee.rest.EmployeeLoginValidator" />
         </property>
-    </bean>-->
+    </bean>
     
     
 

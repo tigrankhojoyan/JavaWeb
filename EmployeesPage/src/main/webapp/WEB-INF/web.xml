@@ -66,6 +66,15 @@
         <servlet-name>CredentialsRequired.jsp</servlet-name>
         <url-pattern>/CredentialsRequired.htm</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>EmployeePage.jsp</servlet-name>
+        <jsp-file>/WEB-INF/jsp/EmployeePage.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EmployeePage.jsp</servlet-name>
+        <url-pattern>/EmployeePage.htm</url-pattern>
+    </servlet-mapping>
 
     <session-config>
         <session-timeout>

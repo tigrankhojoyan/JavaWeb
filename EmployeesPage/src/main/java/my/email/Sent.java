@@ -66,14 +66,22 @@ public class Sent {
     public void setRecipients(String recipients) {
         this.recipients = recipients;
     }
+
+    public int getMessageNum() {
+        return messageNum;
+    }
+
+    public void setMessageNum(int messageNum) {
+        this.messageNum = messageNum;
+    }
     
     @Override
     public String toString() {
         String sendStringData = "{\"messageText\": \""
                 + getMessageText() + "\", \"messageSubject\":\""
                 + getMessageSubject() + "\", \"recipients\":\""
-                + getRecipients() + "\"}";
+                + getRecipients() + "\", \"messageNum\":"
+                + getMessageNum() + "}";
         return sendStringData;
     }
-    
 }

@@ -19,6 +19,7 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import employee.rest.IndividualData;
+import java.util.HashMap;
 import my.email.Inbox;
 import my.email.MyNamingStrategy;
 import my.email.Sent;
@@ -128,6 +129,19 @@ public class DBFunctions {
             session.close();
         }
         return null;
+    }
+
+    public boolean validateCredentials(String userName, String password) {
+        List<Employee> employeesList = getAllEmployees();
+        HashMap<String, String> userNamesPasswords = new HashMap<>();
+        for (Employee employee : employeesList) {
+            userNamesPasswords.put(employee.getUserName(), employee.getPassword());
+        }
+        if (userNamesPasswords.containsKey(userName)
+                && userNamesPasswords.get(userName).equals(password)) {
+            return true;
+        }
+        return false;
     }
 
     public boolean deleteEmployeeData(String userName) {
@@ -292,7 +306,7 @@ public class DBFunctions {
             throw new ExceptionInInitializerError(ex);
         }
     }
-    
+
     public boolean sendMessage(String sender, Sent messageData) {
         try {
             sendBoxFactory = new AnnotationConfiguration().
@@ -318,6 +332,164 @@ public class DBFunctions {
             System.out.println("Failed to create sessionFactory object." + ex.getMessage());
             return false;
         }
+    }
+
+    public List<Inbox> getInbox(String userName) {
+        inboxFactory = new AnnotationConfiguration().
+                configure().
+                addAnnotatedClass(Inbox.class).
+                setNamingStrategy(new MyNamingStrategy(userName)).
+                buildSessionFactory();
+        Session session = inboxFactory.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List<Inbox> inboxList = new ArrayList<Inbox>();
+            List inboxes = session.createSQLQuery("select * from INBOX" + userName).addEntity(Inbox.class).list();
+            ObjectMapper mapper = new ObjectMapper();
+            Inbox inbox = null;
+            for (Iterator iterator
+                    = inboxes.iterator(); iterator.hasNext();) {
+                inbox = (Inbox) iterator.next();
+                inboxList.add(mapper.readValue(
+                        inbox.toString(), Inbox.class));
+            }
+            tx.commit();
+            return inboxList;
+        } catch (HibernateException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Failed to parse data to Inbox class");
+            System.err.println(e.getMessage());
+        } finally {
+            session.close();
+        }
+        return null;
+    }
+
+    public List<Sent> getSentBox(String userName) {
+        sendBoxFactory = new AnnotationConfiguration().
+                configure().
+                addAnnotatedClass(Sent.class).
+                setNamingStrategy(new MyNamingStrategy(userName)).
+                buildSessionFactory();
+        Session session = sendBoxFactory.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List<Sent> sendBoxList = new ArrayList<Sent>();
+            List sendBoxes = session.createSQLQuery("select * from SENT" + userName).addEntity(Sent.class).list();
+            ObjectMapper mapper = new ObjectMapper();
+            Sent sent = null;
+            for (Iterator iterator
+                    = sendBoxes.iterator(); iterator.hasNext();) {
+                sent = (Sent) iterator.next();
+                sendBoxList.add(mapper.readValue(
+                        sent.toString(), Sent.class));
+            }
+            tx.commit();
+            return sendBoxList;
+        } catch (HibernateException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("Failed to parse data to Sent class");
+            System.err.println(e.getMessage());
+        } finally {
+            session.close();
+        }
+        return null;
+    }
+
+    public Inbox getInboxMessageByID(String userName, int id) {
+        List<Inbox> allInboxMessages = getInbox(userName);
+        for (Inbox message : allInboxMessages) {
+            if (message.getMessageNum() == id) {
+                return message;
+            }
+        }
+        return null;
+    }
+
+    public Sent getSentMessageByID(String userName, int id) {
+        List<Sent> allSentMessages = getSentBox(userName);
+        for (Sent message : allSentMessages) {
+            if (message.getMessageNum() == id) {
+                return message;
+            }
+        }
+        return null;
+    }
+
+    public boolean removeSpecifiedInboxMessage(String userName, int messageId) {
+        inboxFactory = new AnnotationConfiguration().
+                configure().
+                addAnnotatedClass(Inbox.class).
+                setNamingStrategy(new MyNamingStrategy(userName)).
+                buildSessionFactory();
+        Session session = inboxFactory.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List inboxes = session.createSQLQuery("select * from INBOX" + userName).addEntity(Inbox.class).list();
+            ObjectMapper mapper = new ObjectMapper();
+            Inbox inbox = null;
+            for (Iterator iterator
+                    = inboxes.iterator(); iterator.hasNext();) {
+                inbox = (Inbox) iterator.next();
+                if (inbox.getMessageNum() == messageId) {
+                    session.delete(inbox);
+                    tx.commit();
+                    return true;
+                }
+            }
+        } catch (HibernateException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return false;
+    }
+
+    public boolean removeSpecifiedSentMessage(String userName, int messageId) {
+        sendBoxFactory = new AnnotationConfiguration().
+                configure().
+                addAnnotatedClass(Sent.class).
+                setNamingStrategy(new MyNamingStrategy(userName)).
+                buildSessionFactory();
+        Session session = sendBoxFactory.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            List sendBoxes = session.createSQLQuery("select * from SENT" + userName).addEntity(Sent.class).list();
+            ObjectMapper mapper = new ObjectMapper();
+            Sent sent = null;
+            for (Iterator iterator
+                    = sendBoxes.iterator(); iterator.hasNext();) {
+                sent = (Sent) iterator.next();
+                if (sent.getMessageNum() == messageId) {
+                    session.delete(sent);
+                    tx.commit();
+                    return true;
+                }
+            }
+        } catch (HibernateException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return false;
     }
 
 }
