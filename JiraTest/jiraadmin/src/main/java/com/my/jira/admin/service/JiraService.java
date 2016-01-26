@@ -30,11 +30,11 @@ public interface JiraService {
             headers = {"Content-type=application/json"})
     public ResponseEntity<ArrayList<Task>> getUserTasks(@RequestParam Integer userId, @RequestHeader HttpHeaders authorizationHeader);
 
-    /*@RequestMapping(value = "assignTask", method = RequestMethod.PUT,
-            headers = {"Content-type=application/json"})
-    public ResponseEntity<String> assignTask(@RequestParam Integer taskId, @RequestParam Integer userId, HttpHeaders authorizationHeader);*/
-
     @RequestMapping(value = "assignTask", method = RequestMethod.PUT,
+            headers = {"Content-type=application/json"})
+    public ResponseEntity<String> assignTask(@RequestParam(value = "taskId") Integer taskId, @RequestParam(value = "userName") String userName, @RequestParam(value = "userId") Integer userId, @RequestHeader HttpHeaders authorizationHeader);
+
+    @RequestMapping(value = "updateTaskStatus", method = RequestMethod.PUT,
             headers = {"Content-type=application/json"})
     public ResponseEntity<String> updateTaskStatus(@RequestParam Integer taskId, @RequestParam String taskStatus, @RequestHeader HttpHeaders authorizationHeader);
 

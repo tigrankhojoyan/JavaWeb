@@ -1,6 +1,7 @@
 package com.my.jira.admin.data.dao;
 
 import com.my.jira.admin.data.Task;
+import com.my.jira.admin.data.TaskStatuses;
 import com.my.jira.admin.data.User;
 import org.hibernate.*;
 import org.hibernate.cfg.Configuration;
@@ -204,5 +205,116 @@ public class CrudFunctions {
         return false;
     }
 
+    /**
+     * Gets the data of user specified by userName
+     *
+     * @param userName
+     * @return - the specified username, if it exist, null otherwise
+     */
+    public static User getSpecifiedUserData(String userName) {
+        Session session = factory.openSession();
+        Criteria criteria = session.createCriteria(User.class);
+        criteria.add(Restrictions.eq("userName", userName));
+        User user = null;
+
+        try {
+            logger.info("Checks if the [{}] user exist.", userName);
+            List users = criteria.list();
+            if (users.size() < 0) {
+                logger.info("The [{}] user does not exist.", userName);
+            } else {
+                user = (User) users.get(0);
+                return user;
+            }
+
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        } finally {
+            session.close();
+        }
+
+        return null;
+    }
+
+    /**
+     *
+     *
+     * @param taskId
+     * @param userName
+     * @param userId
+     * @throws Exception
+     */
+    public static void assignTaskToUser(int taskId, String userName, int userId) throws Exception {
+        //
+        if(!isSpecifiedUserExist(userName)) {
+            throw new Exception("The specified user does not exist");
+        }
+        //
+        Session session = factory.openSession();
+        Criteria criteria = session.createCriteria(Task.class);
+        criteria.add(Restrictions.eq("taskId", taskId));
+
+        try {
+            List tasks = criteria.list();
+            for (int i = 0; i < tasks.size(); i++) {
+                Task task = (Task) tasks.get(i);
+                task.setAssigneeUserId(userId);
+                session.update(task);
+            }
+            logger.info("The task by [{}] id has been assigned to [{}] user successfully.",
+                    new Object[] {taskId, userName});
+            session.getTransaction().commit();
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+            throw new Exception("Failed to assign the task by '" + taskId +
+                    "' id to '" + userName + "' user");
+        } finally {
+            session.close();
+        }
+
+    }
+
+
+    /**
+     * Updates the status of the specified task.
+     *
+     * @param taskId
+     * @param taskStatus
+     * @return
+     */
+    public static CrudStatuses updateTaskStatus(int taskId, String taskStatus) {
+
+        if(TaskStatuses.valueOf(taskStatus) == null) {
+            return CrudStatuses.TASK_STATUS_UPDATE_INVALID;
+        }
+
+        Session session = factory.openSession();
+        Criteria criteria = session.createCriteria(Task.class);
+        criteria.add(Restrictions.eq("taskId", taskId));
+
+        try {
+            List tasks = criteria.list();
+            if(tasks.size() > 0) {
+                Task task = (Task) tasks.get(0);
+                task.setTaskStatus(taskStatus);
+                session.update(task);
+                logger.info("The status of task by [{}] id has been updated successfully.",
+                        new Object[]{taskId});
+                session.getTransaction().commit();
+                return CrudStatuses.TASK_ASSIGN_STATUS_SUCCESS;
+            }
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        } finally {
+            session.close();
+        }
+
+        logger.info("The task by [{}] status does not exist.",
+                new Object[] {taskId});
+        return CrudStatuses.TASK_ASSIGN_STATUS_FAIL;
+    }
 
 }
