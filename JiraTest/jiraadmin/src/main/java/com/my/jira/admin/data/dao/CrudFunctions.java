@@ -155,6 +155,7 @@ public class CrudFunctions {
         logger.info("Trying to delete the [{}] user account.", userName);
 
         try {
+            session.beginTransaction();
             List users = criteria.list();
             for (int i = 0; i < users.size(); i++) {
                 User user = (User) users.get(i);
@@ -187,6 +188,7 @@ public class CrudFunctions {
         logger.info("Trying to delete the task, which id is: [{}].", taskId);
 
         try {
+            session.beginTransaction();
             List tasks = criteria.list();
             for (int i = 0; i < tasks.size(); i++) {
                 Task task = (Task) tasks.get(i);
@@ -256,6 +258,7 @@ public class CrudFunctions {
         criteria.add(Restrictions.eq("taskId", taskId));
 
         try {
+            session.beginTransaction();
             List tasks = criteria.list();
             for (int i = 0; i < tasks.size(); i++) {
                 Task task = (Task) tasks.get(i);
@@ -295,6 +298,7 @@ public class CrudFunctions {
         criteria.add(Restrictions.eq("taskId", taskId));
 
         try {
+            session.beginTransaction();
             List tasks = criteria.list();
             if(tasks.size() > 0) {
                 Task task = (Task) tasks.get(0);

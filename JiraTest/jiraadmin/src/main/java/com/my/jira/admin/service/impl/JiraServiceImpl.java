@@ -80,8 +80,8 @@ public class JiraServiceImpl implements JiraService {
     }
 
     @Override
-    public ResponseEntity<String> assignTask(@RequestParam(value = "taskId") Integer taskId, @RequestParam(value = "userName") String userName,
-                                             @RequestParam(value = "userId") Integer userId, @RequestHeader HttpHeaders authorizationHeader) {
+    public ResponseEntity<String> assignTask(@RequestParam(value = "taskId", required = true) Integer taskId, @RequestParam(value = "userName", required = true) String userName,
+                                             @RequestParam(value = "userId", required = true) Integer userId, @RequestHeader HttpHeaders authorizationHeader) {
 
         ResponseEntity<String> authorizationStatus = checkRequestHeaders(authorizationHeader,
                 resourceBundle.getString("authorizationUpdateData"));
@@ -122,6 +122,15 @@ public class JiraServiceImpl implements JiraService {
     @Override
     public ResponseEntity<String> deleteUser(@RequestParam Integer userId, @RequestHeader HttpHeaders authorizationHeader) {
         return null;
+    }
+
+    @Override
+    public ResponseEntity<String> exceptionHandlerTest(@PathVariable String id) {
+        if(id.equals("1")) {
+            throw new RuntimeException("Runtime exception");
+        }
+
+        return new ResponseEntity<String>("The exception was not thrown", HttpStatus.OK);
     }
 
     @RequestMapping(value = "test", method = RequestMethod.GET)

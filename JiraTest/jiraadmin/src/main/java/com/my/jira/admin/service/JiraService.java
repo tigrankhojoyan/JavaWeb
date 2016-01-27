@@ -41,4 +41,7 @@ public interface JiraService {
     @RequestMapping(value = "deleteUser", method = RequestMethod.DELETE,
             headers = {"Content-type=application/json"})
     public ResponseEntity<String> deleteUser(@RequestParam Integer userId, @RequestHeader HttpHeaders authorizationHeader);
+
+    @RequestMapping(value = "exceptionHandlerTest/{id}", method = RequestMethod.GET)
+    public ResponseEntity<String> exceptionHandlerTest(@PathVariable String id);
 }
