@@ -148,7 +148,7 @@ public class CrudFunctions {
      * @param userName
      * @return - true, if data deleted successfully, false otherwise
      */
-    public static boolean deleteSpecifiedUser(String userName) {
+    public static CrudStatuses deleteSpecifiedUser(String userName) {
         Session session = factory.openSession();
         Criteria criteria = session.createCriteria(User.class);
         criteria.add(Restrictions.eq("userName", userName));
@@ -157,13 +157,13 @@ public class CrudFunctions {
         try {
             session.beginTransaction();
             List users = criteria.list();
-            for (int i = 0; i < users.size(); i++) {
-                User user = (User) users.get(i);
-                session.delete(user);
-            }
+            if(users.size() < 1)
+                return CrudStatuses.USER_DELETE_NON_EXISTING_USER;
+            User user = (User) users.get(0);
+            session.delete(user);
             session.getTransaction().commit();
             logger.info("The [{}] user has been deleted successfully.", userName);
-            return true;
+            return CrudStatuses.USER_DELETE_SUCCESS;
         } catch (HibernateException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -171,7 +171,7 @@ public class CrudFunctions {
             session.close();
         }
 
-        return false;
+        return CrudStatuses.USER_DELETE_FAIL;
     }
 
     /**
@@ -180,7 +180,7 @@ public class CrudFunctions {
      * @param taskId
      * @return - true, if the task has been deleted successfully, false otherwise
      */
-    public static boolean deleteSpecifiedTask(Integer taskId) {
+    public static CrudStatuses deleteSpecifiedTask(Integer taskId) {
 
         Session session = factory.openSession();
         Criteria criteria = session.createCriteria(Task.class);
@@ -190,13 +190,13 @@ public class CrudFunctions {
         try {
             session.beginTransaction();
             List tasks = criteria.list();
-            for (int i = 0; i < tasks.size(); i++) {
-                Task task = (Task) tasks.get(i);
-                session.delete(task);
-            }
+            if(tasks.size() < 1)
+                return  CrudStatuses.TASK_DELETE_NON_EXISTING_TASK;
+            Task task = (Task) tasks.get(0);
+            session.delete(task);
             logger.info("The task by [{}] id has been deleted successfully.", taskId);
             session.getTransaction().commit();
-            return true;
+            return CrudStatuses.TASK_DELETE_SUCCESS;
         } catch (HibernateException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -204,7 +204,7 @@ public class CrudFunctions {
             session.close();
         }
 
-        return false;
+        return CrudStatuses.USER_DELETE_FAIL;
     }
 
     /**
@@ -317,8 +317,67 @@ public class CrudFunctions {
         }
 
         logger.info("The task by [{}] status does not exist.",
-                new Object[] {taskId});
+                new Object[]{taskId});
         return CrudStatuses.TASK_ASSIGN_STATUS_FAIL;
     }
+
+    /**
+     * Gets all the tasks
+     *
+     * @return
+     */
+    public static ArrayList<Task> getAllTasks() {
+        Session session = factory.openSession();
+        ArrayList<Task> tasksList = new ArrayList<Task>();
+
+        try {
+            session.beginTransaction();
+            List tasks = session.createQuery("FROM TASK").list();
+            logger.info("Trying to list all the tasks:\n");
+            for(int i = 0; i < tasks.size(); i++) {
+                Task task = (Task) tasks.get(i);
+                tasksList.add(task);
+                logger.info("The task with [{}] id is the following.\n [{}]",
+                        new Object[]{task.getTaskId(), task.toString()});
+            }
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        } finally {
+            session.close();
+            return tasksList;
+        }
+
+    }
+
+    /**
+     * Gets all the users.
+     *
+     * @return
+     */
+    public static ArrayList<User> getAllUsers() {
+        Session session = factory.openSession();
+        ArrayList<User> usersList = new ArrayList<User>();
+
+        try {
+            session.beginTransaction();
+            List users = session.createQuery("FROM USER").list();
+            logger.info("Trying to list all the users:\n");
+            for(int i = 0; i < users.size(); i++) {
+                User user = (User) users.get(i);
+                usersList.add(user);
+                logger.info("The task with [{}] id is the following.\n [{}]",
+                        new Object[]{user.getUserId(), user.toString()});
+            }
+        } catch (HibernateException e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        } finally {
+            session.close();
+            return usersList;
+        }
+    }
+
+
 
 }

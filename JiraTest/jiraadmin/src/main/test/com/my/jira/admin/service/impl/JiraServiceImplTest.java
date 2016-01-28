@@ -4,6 +4,7 @@ import com.beust.testng.TestNG;
 import com.my.jira.admin.data.Task;
 import com.my.jira.admin.data.User;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -11,12 +12,14 @@ import org.testng.annotations.Test;
 import utils.MyHttpClient;
 
 import java.util.HashMap;
+import java.util.ResourceBundle;
 
 /**
  * Created by tigran on 1/22/16.
  */
 public class JiraServiceImplTest extends TestNG {
 
+    ResourceBundle resourceBundle = ResourceBundle.getBundle("keys");
     @BeforeMethod
     public void setUp() throws Exception {
 
@@ -76,6 +79,19 @@ public class JiraServiceImplTest extends TestNG {
 
     @Test
     public void testDeleteUser() throws Exception {
+
+        String url = "http://localhost:8085/rest/jiraService/deleteUser";
+        String userName = "testUserName";
+        String authorizationKey = resourceBundle.getString("authorizationDeleteUser");
+
+        HttpResponse deleteResponse = MyHttpClient.sendDelete(url, userName, authorizationKey);
+
+        Assert.assertEquals(HttpStatus.SC_ACCEPTED, deleteResponse.getStatusLine().getStatusCode());
+
+    }
+
+    @Test
+    public void testDeleteTask() {
 
     }
 

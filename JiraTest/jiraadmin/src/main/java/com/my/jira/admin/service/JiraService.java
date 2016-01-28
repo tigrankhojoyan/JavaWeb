@@ -38,10 +38,20 @@ public interface JiraService {
             headers = {"Content-type=application/json"})
     public ResponseEntity<String> updateTaskStatus(@RequestParam Integer taskId, @RequestParam String taskStatus, @RequestHeader HttpHeaders authorizationHeader);
 
-    @RequestMapping(value = "deleteUser", method = RequestMethod.DELETE,
-            headers = {"Content-type=application/json"})
-    public ResponseEntity<String> deleteUser(@RequestParam Integer userId, @RequestHeader HttpHeaders authorizationHeader);
+    @RequestMapping(value = "deleteUser/{userName}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteUser(@PathVariable String userName, @RequestHeader HttpHeaders authorizationHeader);
+
+    @RequestMapping(value = "deleteTask/{taskId}", method = RequestMethod.DELETE)
+    public ResponseEntity<String> deleteTask(@PathVariable Integer taskId, @RequestHeader HttpHeaders authorizationHeader);
 
     @RequestMapping(value = "exceptionHandlerTest/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> exceptionHandlerTest(@PathVariable String id);
+
+    @RequestMapping(value = "getAllTask", method = RequestMethod.GET,
+            headers = {"Content-type=application/json"})
+    public ResponseEntity<ArrayList<Task>> getAllTasks(@RequestHeader HttpHeaders authorizationHeader);
+
+    @RequestMapping(value = "getAllUsers", method = RequestMethod.GET,
+            headers = {"Content-type=application/json"})
+    public ResponseEntity<ArrayList<User>> getAllUsers(@RequestHeader HttpHeaders authorizationHeader);
 }

@@ -14,8 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -36,6 +34,10 @@ public class JiraServiceImpl implements JiraService {
                 !authorizationHeader.get("authorization").get(0).equals(resourceBundle.getString("authorizationAddUser"))) {
             return new ResponseEntity<String>("Not Authorized", HttpStatus.UNAUTHORIZED);
         }
+
+        //Checks if there is another user with specified username
+        if(CrudFunctions.isSpecifiedUserExist(user.getUserName()))
+            return new ResponseEntity<String>("Duplicate user data", HttpStatus.CONFLICT);
 
         // Tries to persist given user data and returns appropriate result
         int userInsertionStatus = CrudFunctions.writeUserToDb(user);
@@ -105,7 +107,6 @@ public class JiraServiceImpl implements JiraService {
 
     @Override
     public ResponseEntity<String> updateTaskStatus(@RequestParam Integer taskId, @RequestParam String taskStatus, @RequestHeader HttpHeaders authorizationHeader) {
-
         ResponseEntity<String> authorizationStatus = checkRequestHeaders(authorizationHeader,
                 resourceBundle.getString("authorizationUpdateData"));
         if(authorizationStatus != null)
@@ -120,8 +121,34 @@ public class JiraServiceImpl implements JiraService {
     }
 
     @Override
-    public ResponseEntity<String> deleteUser(@RequestParam Integer userId, @RequestHeader HttpHeaders authorizationHeader) {
-        return null;
+    public ResponseEntity<String> deleteUser(@PathVariable String userName, @RequestHeader HttpHeaders authorizationHeader) {
+        ResponseEntity<String> authorizationStatus = checkRequestHeaders(authorizationHeader,
+                resourceBundle.getString("authorizationDeleteUser"));
+        if(authorizationStatus != null)
+            return authorizationStatus;
+
+        CrudStatuses userDeleteStatus = CrudFunctions.deleteSpecifiedUser(userName);
+        if(userDeleteStatus == CrudStatuses.USER_DELETE_NON_EXISTING_USER)
+            return new ResponseEntity<String>(userDeleteStatus.getCrudStatusMessage(), HttpStatus.NOT_FOUND);
+        else if(userDeleteStatus == CrudStatuses.USER_DELETE_FAIL)
+            return new ResponseEntity<String>(userDeleteStatus.getCrudStatusMessage(), HttpStatus.FORBIDDEN);
+
+        return new ResponseEntity<String>(userDeleteStatus.getCrudStatusMessage(), HttpStatus.ACCEPTED);
+    }
+
+    @Override
+    public ResponseEntity<String> deleteTask(@PathVariable Integer taskId, @RequestHeader HttpHeaders authorizationHeader) {
+        ResponseEntity<String> authorizationStatus = checkRequestHeaders(authorizationHeader,
+                resourceBundle.getString("authorizationDeleteTask"));
+        if(authorizationStatus != null)
+            return authorizationStatus;
+        CrudStatuses taskDeleteStatus = CrudFunctions.deleteSpecifiedTask(taskId);
+        if(taskDeleteStatus == CrudStatuses.TASK_DELETE_NON_EXISTING_TASK)
+            return new ResponseEntity<String>(taskDeleteStatus.getCrudStatusMessage(), HttpStatus.NOT_FOUND);
+        else if(taskDeleteStatus == CrudStatuses.TASK_DELETE_FAIL)
+            return new ResponseEntity<String>(taskDeleteStatus.getCrudStatusMessage(), HttpStatus.FORBIDDEN);
+
+        return new ResponseEntity<String>(taskDeleteStatus.getCrudStatusMessage(), HttpStatus.ACCEPTED);
     }
 
     @Override
@@ -131,6 +158,34 @@ public class JiraServiceImpl implements JiraService {
         }
 
         return new ResponseEntity<String>("The exception was not thrown", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<ArrayList<Task>> getAllTasks(@RequestHeader HttpHeaders authorizationHeader) {
+        ResponseEntity<ArrayList<Task>> authorizationStatus = checkRequestHeaders(authorizationHeader,
+                resourceBundle.getString("adminTasksKey"));
+        if(authorizationStatus != null)
+            return authorizationStatus;
+
+        ArrayList<Task> allTasks = CrudFunctions.getAllTasks();
+        if(allTasks.size() == 0)
+            return new ResponseEntity<ArrayList<Task>>(allTasks, HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<ArrayList<Task>>(allTasks, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<ArrayList<User>> getAllUsers(@RequestHeader HttpHeaders authorizationHeader) {
+        ResponseEntity<ArrayList<User>> authorizationStatus = checkRequestHeaders(authorizationHeader,
+                resourceBundle.getString("adminUsersKey"));
+        if(authorizationStatus != null)
+            return authorizationStatus;
+
+        ArrayList<User> allUsers = CrudFunctions.getAllUsers();
+        if(allUsers.size() == 0)
+            return new ResponseEntity<ArrayList<User>>(allUsers, HttpStatus.NO_CONTENT);
+
+        return new ResponseEntity<ArrayList<User>>(allUsers, HttpStatus.OK);
     }
 
     @RequestMapping(value = "test", method = RequestMethod.GET)

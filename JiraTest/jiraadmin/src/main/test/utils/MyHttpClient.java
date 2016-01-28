@@ -3,6 +3,7 @@ package utils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.ByteArrayEntity;
@@ -46,7 +47,7 @@ public class MyHttpClient {
             String result = EntityUtils.toString(response.getEntity());
 
             logger.info("The response code is [{}], and the response body is \n [{}]",
-                    new Object[] {response.getStatusLine().getStatusCode(), result});
+                    new Object[]{response.getStatusLine().getStatusCode(), result});
 
         } catch (UnsupportedEncodingException e) {
             logger.error("UnsupportedEncodingException error occurred during post request\n, {}",
@@ -64,12 +65,13 @@ public class MyHttpClient {
     public static HttpResponse sendPut(String url, HashMap<String, Object> body, String authorizationHeader) throws IOException {
         String requestParam = "?";
         Set<String> bodyKeys = body.keySet();
-        for(String key:bodyKeys) {
-            requestParam += key + "=" + body.get(key) + "&&";
+        for (String key : bodyKeys) {
+            requestParam += key + "=" + body.get(key) + "&";
         }
 
         url += requestParam;
-        HttpPut httpPut = new HttpPut(url.substring(0, url.length() - 2));
+        url = url.substring(0, url.length() - 2);
+        HttpPut httpPut = new HttpPut(url);
         HttpResponse response = null;
 
         // add headers
@@ -86,8 +88,39 @@ public class MyHttpClient {
             String result = EntityUtils.toString(response.getEntity());
 
             logger.info("The response code is [{}], and the response body is \n [{}]",
-                    new Object[] {response.getStatusLine().getStatusCode(), result});
+                    new Object[]{response.getStatusLine().getStatusCode(), result});
 
+        } catch (UnsupportedEncodingException e) {
+            logger.error("UnsupportedEncodingException error occurred during post request\n, {}",
+                    new Object[]{e.getMessage()});
+        } catch (ClientProtocolException e) {
+            logger.error("ClientProtocolException error occurred during post request\n, {}",
+                    new Object[]{e.getMessage()});
+        } catch (IOException e) {
+            logger.error("ClientProtocolException error occurred during post request\n, {}",
+                    new Object[]{e.getMessage()});
+        }
+        return response;
+    }
+
+    public static HttpResponse sendDelete(String url, String userName, String authorizationHeader) throws IOException {
+
+        HttpDelete httpDelete = new HttpDelete(url + "/" + userName);
+        HttpResponse response = null;
+
+        // add headers
+        httpDelete.setHeader("User-Agent", USER_AGENT);
+        httpDelete.setHeader("Content-type", "application/json");
+        httpDelete.setHeader("authorization", authorizationHeader);
+
+        try {
+            logger.info("Send delete request to [{}] endpoint.",
+                    new Object[]{url});
+            response = client.execute(httpDelete);
+            String result = EntityUtils.toString(response.getEntity());
+
+            logger.info("The response code is [{}], and the response body is \n [{}]",
+                    new Object[]{response.getStatusLine().getStatusCode(), result});
         } catch (UnsupportedEncodingException e) {
             logger.error("UnsupportedEncodingException error occurred during post request\n, {}",
                     new Object[]{e.getMessage()});
