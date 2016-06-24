@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Vquick.iml" filepath="$PROJECT_DIR$/Vquick.iml" />
+      <module fileurl="file://$PROJECT_DIR$/business-layer/business-layer.iml" filepath="$PROJECT_DIR$/business-layer/business-layer.iml" />
       <module fileurl="file://$PROJECT_DIR$/dao-layer/dao-layer.iml" filepath="$PROJECT_DIR$/dao-layer/dao-layer.iml" />
       <module fileurl="file://$PROJECT_DIR$/rest-service/rest-service.iml" filepath="$PROJECT_DIR$/rest-service/rest-service.iml" />
     </modules>

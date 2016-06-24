@@ -24,7 +24,14 @@
         <processorPath useClasspath="true" />
         <module name="rest-service" />
       </profile>
-      <profile default="false" name="Maven default annotation processors profile" enabled="true">
+      <profile default="false" name="Annotation profile for business-layer" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="true" />
+        <module name="business-layer" />
+      </profile>
+      <profile default="false" name="Annotation profile for dao-layer" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -33,8 +40,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="dao-layer" target="1.5" />
-      <module name="rest-service" target="1.7" />
+      <module name="business-layer" target="1.8" />
+      <module name="dao-layer" target="1.8" />
+      <module name="rest-service" target="1.8" />
       <module name="Vquick" target="1.5" />
     </bytecodeTargetLevel>
   </component>

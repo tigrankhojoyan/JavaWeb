@@ -1,6 +1,11 @@
 package com.vquick.dao.data;
 
+import org.hibernate.annotations.*;
+
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * Created by tigran on 1/31/16.
@@ -11,7 +16,7 @@ public class User {
 
     @Id
     @Column(name="userId")
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int userId;
 
     @Column(name = "userName")
@@ -20,7 +25,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @ManyToOne
+    @ManyToOne(cascade={CascadeType.ALL})
     @JoinColumn(name = "userData")
     private UserData userData;
 
@@ -32,6 +37,7 @@ public class User {
         this.userName = userName;
         this.password = password;
         this.userData = userData;
+        /*this.userId = 0;*/
     }
 
     public User(String userName, String password) {

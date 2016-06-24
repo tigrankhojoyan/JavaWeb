@@ -11,8 +11,8 @@ public class UserData {
 
     @Id
     @Column(name = "userDataId")
-    @GeneratedValue
-    private Integer userDataId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int userDataId;
 
     @Column(name = "fullName")
     private String fullName;
@@ -27,10 +27,11 @@ public class UserData {
 
     }
 
-    public UserData(Integer userId, String fullName, String address, Integer age) {
+    public UserData(String fullName, String address, Integer age) {
         this.fullName = fullName;
         this.address = address;
         this.age = age;
+//        this.userDataId = 0;
     }
 
     public Integer getUserDataId() {
